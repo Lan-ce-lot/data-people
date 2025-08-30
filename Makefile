@@ -10,7 +10,7 @@ build:
 .PHONY: run
 run:
 	go mod tidy
-	go run main.go -config test_config.yaml
+	go run main.go crawl --config test_config.yaml
 
 .PHONY: clean
 clean:

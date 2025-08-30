@@ -49,7 +49,6 @@ func (p *Parser) ParseSearchResponse(responseBody []byte, searchURL string) (*mo
 func (p *Parser) parseHTMLSearchResults(html string, searchURL string) (*models.APIResponse, error) {
 	// 直接解析这个HTML页面作为单篇文章
 	article, err := p.ParseHTMLStructure(html)
-	article.URL = searchURL
 	if err != nil {
 		log.Printf("解析文章HTML失败: %v", err)
 		// 返回空结果而不是错误，保持程序继续运行
@@ -58,6 +57,7 @@ func (p *Parser) parseHTMLSearchResults(html string, searchURL string) (*models.
 
 	var articles []models.Article
 	if article != nil {
+		article.URL = searchURL
 		log.Printf("从HTML页面解析到文章: %s", article.Title)
 		articles = append(articles, *article)
 	}
@@ -168,13 +168,19 @@ func (p *Parser) ParseHTMLStructure(htmlContent string) (*models.Article, error)
 	containerPath := "//html/body/div[1]/div[1]/div[2]/div[1]"
 	containerNode := htmlquery.FindOne(doc, containerPath)
 	if containerNode == nil {
-		return nil, fmt.Errorf("未找到主容器div")
+		log.Printf("警告: 未找到主容器div，返回空文章")
+		// 返回空文章而不是错误，避免程序崩溃
+		article.CreatedAt = time.Now()
+		return article, nil
 	}
 
 	// 获取容器下的所有直接子div
 	childDivs := htmlquery.Find(containerNode, "./div")
 	if len(childDivs) == 0 {
-		return nil, fmt.Errorf("主容器下未找到子div")
+		log.Printf("警告: 主容器下未找到子div，返回空文章")
+		// 返回空文章而不是错误，避免程序崩溃
+		article.CreatedAt = time.Now()
+		return article, nil
 	}
 
 	// 3. 按照设计文档的逻辑解析各字段

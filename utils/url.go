@@ -9,16 +9,19 @@ import (
 	"github.com/Lan-ce-lot/data-people/models"
 )
 
-const (
-	BaseSearchURL = "https://data.people.com.cn/rmrb/pd.html"
-)
-
 // URLBuilder URL构建器
-type URLBuilder struct{}
+type URLBuilder struct {
+	baseSearchURL string
+}
 
 // NewURLBuilder 创建URL构建器
-func NewURLBuilder() *URLBuilder {
-	return &URLBuilder{}
+func NewURLBuilder(baseSearchURL string) *URLBuilder {
+	if baseSearchURL == "" {
+		baseSearchURL = "https://data.people.com.cn/rmrb/pd.html" // 默认值
+	}
+	return &URLBuilder{
+		baseSearchURL: baseSearchURL,
+	}
 }
 
 // BuildSearchURL 构建搜索URL
@@ -66,7 +69,7 @@ func (u *URLBuilder) BuildSearchURL(startDate, endDate time.Time, pageNo, positi
 	params.Set("tr", "A")
 
 	// 构建完整URL
-	searchURL := fmt.Sprintf("%s?%s", BaseSearchURL, params.Encode())
+	searchURL := fmt.Sprintf("%s?%s", u.baseSearchURL, params.Encode())
 	return searchURL, nil
 }
 
