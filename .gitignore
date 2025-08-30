@@ -1,0 +1,14 @@
+dist/*.tar.gz
+dist/*.docker
+dist/here.txt
+cover.out
+.editorconfig
+.idea/
+*.exe
+bash_unit
+.vscode/*
+vendor/*
+data/
+*.csv
+.DS_Store
+*config.yaml
